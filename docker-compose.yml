@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: trend_postgres
+    environment:
+      POSTGRES_USER: trend
+      POSTGRES_PASSWORD: trend
+      POSTGRES_DB: trend_laundry
+    ports:
+      - "5432:5432"
+    volumes:
+      - trend_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trend -d trend_laundry"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: trend_redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - trend_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  trend_pgdata:
+  trend_redisdata:
